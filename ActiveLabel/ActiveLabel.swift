@@ -232,8 +232,17 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
             }
             avoidSuperCall = true
         case .cancelled:
+            guard let selectedElement = selectedElement else { return avoidSuperCall }
+            
+            switch selectedElement.element {
+            case .mention(let userHandle): didTapMention(userHandle)
+            case .hashtag(let hashtag): didTapHashtag(hashtag)
+            case .url(let originalURL, _): didTapStringURL(originalURL)
+            case .custom(let element): didTap(element, for: selectedElement.type)
+            case .email(let element): didTapStringEmail(element)
+            }
             updateAttributesWhenSelected(false)
-            selectedElement = nil
+            self.selectedElement = nil
         case .stationary:
             break
         @unknown default:
